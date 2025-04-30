@@ -1,0 +1,119 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <fstream>
+#include <string>
+using namespace std;
+
+class Person {
+private:
+    string name;
+    int age;
+public:
+    Person(string name = "NoName", int age = 0) : name(name), age(age) {}
+
+    string getName() const { return name; }
+    int getAge() const { return age; }
+
+    // Overload <<
+    friend ostream& operator<<(ostream& os, const Person& p) {
+        os << "Person[Name: " << p.name << ", Age: " << p.age << "]";
+        return os;
+    }
+
+    // Overload <
+    bool operator<(const Person& other) const {
+        return name < other.name;
+    }
+
+    // Overload ==
+    bool operator==(const Person& other) const {
+        return name == other.name && age == other.age;
+    }
+};
+
+int findPersonIndex(const vector<Person*>& people, const string& targetName) {
+    for (size_t i = 0; i < people.size(); ++i) {
+        if (people[i]->getName() == targetName) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int main() {
+    // 1. Populate vector
+    vector<Person*> people = {
+        new Person("Homer Simpson", 39),
+        new Person("Marge Simpson", 36),
+        new Person("Bart Simpson", 10),
+        new Person("Lisa Simpson", 8),
+        new Person("Maggie Simpson", 1),
+        new Person("Ned Flanders", 60),
+        new Person("Milhouse Van Houten", 10),
+        new Person("Mr. Burns", 104)
+    };
+
+    // 2. Access front and back
+    cout << "First: " << *people.front() << endl;
+    cout << "Last: " << *people.back() << endl;
+
+    // 3. Remove Mr. Burns
+    int index = findPersonIndex(people, "Mr. Burns");
+    if (index != -1) {
+        delete people[index]; // Free memory
+        people.erase(people.begin() + index);
+    }
+
+    cout << "\nAfter removing Mr. Burns:\n";
+    for (Person* p : people) cout << *p << endl;
+
+    // 4. Sort by name
+    sort(people.begin(), people.end(),
+        [](Person* a, Person* b) { return *a < *b; });
+
+    cout << "\nSorted by name:\n";
+    for (Person* p : people) cout << *p << endl;
+
+    // 5. Find Milhouse
+    auto it = find_if(people.begin(), people.end(),
+        [](Person* p) { return p->getName() == "Milhouse Van Houten"; });
+    if (it != people.end()) {
+        cout << "\nMilhouse found!\n";
+    }
+    else {
+        cout << "\nMilhouse not found.\n";
+    }
+
+    // 6. Save to file
+    ofstream fout("people.txt");
+    for (Person* p : people) {
+        fout << p->getName() << "," << p->getAge() << endl;
+    }
+    fout.close();
+
+    // 7. Free memory
+    for (Person* p : people) delete p;
+    people.clear();
+
+    // 8. Load from file
+    ifstream fin("people.txt");
+    string name;
+    int age;
+    while (getline(fin, name, ',')) {
+        fin >> age;
+        fin.ignore(); // Ignore newline
+        people.push_back(new Person(name, age));
+    }
+    fin.close();
+
+    cout << "\nReloaded from file:\n";
+    for (auto it = people.begin(); it != people.end(); ++it) {
+        cout << **it << endl;
+    }
+
+    // Final cleanup
+    for (Person* p : people) delete p;
+
+    return 0;
+}
