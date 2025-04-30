@@ -1,0 +1,103 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+using namespace std;
+
+class Resident {
+private:
+    string name;
+    int age;
+    string occupation;
+
+public:
+    // Lazy Constructor
+    Resident(string name = "NoName", int age = 0, string occupation = "Unknown")
+        : name(name), age(age), occupation(occupation) {}
+
+    // Getters
+    string getName() const { return name; }
+    int getAge() const { return age; }
+    string getOccupation() const { return occupation; }
+
+    // Display resident information
+    void display() const {
+        cout << "Name: " << name << ", Age: " << age << ", Occupation: " << occupation << endl;
+    }
+
+    // Operator < for sorting by age
+    bool operator<(const Resident& other) const {
+        return age < other.age;
+    }
+};
+
+int main() {
+    vector<Resident> residents;
+
+    // Initial residents
+    residents.push_back(Resident("Homer Simpson", 39, "Nuclear Safety Inspector"));
+    residents.push_back(Resident("Marge Simpson", 36, "Housewife"));
+    residents.push_back(Resident("Bart Simpson", 10, "Student"));
+    residents.push_back(Resident("Lisa Simpson", 8, "Student"));
+    residents.push_back(Resident("Maggie Simpson", 1, "Baby"));
+
+    // Display all residents
+    cout << "All residents:" << endl;
+    for (Resident r : residents) {
+        r.display();
+    }
+
+    // Add two more residents
+    residents.push_back(Resident("Ned Flanders", 60, "Store Owner"));
+    residents.push_back(Resident("Mr. Skinner", 64, "School Principal"));
+
+    // Display residents over 30 years old
+    cout << "\n\nResidents over 30 years old:" << endl;
+    for (Resident r : residents) {
+        if (r.getAge() > 30) {
+            r.display();
+        }
+    }
+
+    // Display residents who are students
+    cout << "\n\nResidents who are students:" << endl;
+    for (Resident r : residents) {
+        if (r.getOccupation() == "Student") {
+            r.display();
+        }
+    }
+
+    // Sort the residents by age (using Selection Sort)
+    cout << "\nSorted by age:" << endl;
+    for (size_t i = 0; i < residents.size() - 1; ++i) {
+        for (size_t j = i + 1; j < residents.size(); ++j) {
+            if (residents[i].getAge() > residents[j].getAge()) {
+                swap(residents[i], residents[j]);
+            }
+        }
+    }
+    for (Resident r : residents) {
+        r.display();
+    }
+
+    // Search for a resident by name
+    cout << "\nSearch for a resident by name:" << endl;
+    string searchName;
+    cout << "Enter name: ";
+    getline(cin, searchName);
+    bool found = false;
+    for (Resident r : residents) {
+        if (r.getName() == searchName) {
+            r.display();
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        cout << "Resident not found." << endl;
+    }
+
+    cout << "\nAll done!" << endl;
+
+    return 0;
+}
