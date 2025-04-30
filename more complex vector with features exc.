@@ -1,0 +1,135 @@
+#include <iostream>
+#include <vector>
+#include <set>
+#include <string>
+#include <algorithm>
+#include <stdexcept>
+using namespace std;
+
+class Resident {
+private:
+    string name;
+    int age;
+    string occupation;
+
+public:
+    // Constructor with exception handling for invalid occupations
+    Resident(string name, int age, string occupation) 
+        : name(name), age(age), occupation(occupation) {
+        // Throw exception for invalid occupations
+        if (occupation == "Professional Nap Taker" || occupation == "Cloud Gazer") {
+            throw runtime_error("Invalid Occupation: " + occupation);
+        }
+    }
+
+    // Getters
+    string getName() const { return name; }
+    int getAge() const { return age; }
+    string getOccupation() const { return occupation; }
+
+    // Display resident information
+    void display() const {
+        cout << "Name: " << name << ", Age: " << age << ", Occupation: " << occupation << endl;
+    }
+
+    // Custom comparator for sorting by name
+    bool operator<(const Resident& other) const {
+        return name < other.name;
+    }
+};
+
+
+int main() {
+    vector<Resident> residents;
+    set<string> occupations;
+
+    try {
+        // Add initial residents and their occupations to the set
+        residents.push_back(Resident("Homer Simpson", 39, "Nuclear Safety Inspector"));
+        occupations.insert("Nuclear Safety Inspector");
+
+        residents.push_back(Resident("Marge Simpson", 36, "Housewife"));
+        occupations.insert("Housewife");
+
+        residents.push_back(Resident("Bart Simpson", 10, "Student"));
+        occupations.insert("Student");
+
+        residents.push_back(Resident("Lisa Simpson", 8, "Student"));
+        occupations.insert("Student");
+
+        residents.push_back(Resident("Maggie Simpson", 1, "Baby"));
+        occupations.insert("Baby");
+
+        // Attempt to add residents with invalid occupations (this will throw exceptions)
+        residents.push_back(Resident("Barney Gumble", 38, "Professional Nap Taker"));
+        occupations.insert("Professional Nap Taker");
+
+        residents.push_back(Resident("Jimbo Jones", 11, "Cloud Gazer"));
+        occupations.insert("Cloud Gazer");
+
+    } catch (const runtime_error& e) {
+        cout << "Error: Could not add resident. " << e.what() << endl;
+    }
+
+    // Safely insert two more residents
+    residents.insert(residents.end(), Resident("Ned Flanders", 60, "Store Owner"));
+    occupations.insert("Store Owner");
+    residents.insert(residents.end(), Resident("Mr. Skinner", 64, "School Principal"));
+    occupations.insert("School Principal");
+
+    // Display all residents using iterators
+    cout << "\nAll residents:" << endl;
+    for (auto it = residents.begin(); it != residents.end(); ++it) {
+        it->display();
+    }
+
+    // Display residents over 30 years old using iterators
+    cout << "\nResidents over 30 years old:" << endl;
+    for (auto it = residents.begin(); it != residents.end(); ++it) {
+        if (it->getAge() > 30) {
+            it->display();
+        }
+    }
+
+    // Display residents who are students using iterators
+    cout << "\nResidents who are students:" << endl;
+    for (auto it = residents.begin(); it != residents.end(); ++it) {
+        if (it->getOccupation() == "Student") {
+            it->display();
+        }
+    }
+
+    // Sort the residents by name and display them
+    cout << "\nSorted by name:" << endl;
+    sort(residents.begin(), residents.end());
+    for (auto it = residents.begin(); it != residents.end(); ++it) {
+        it->display();
+    }
+
+    // Search for a resident by name
+    cout << "\nSearch for a resident by name:" << endl;
+    string searchName;
+    cout << "Enter resident name to search: ";
+    getline(cin, searchName);
+
+    bool found = false;
+    for (auto it = residents.begin(); it != residents.end(); ++it) {
+        if (it->getName() == searchName) {
+            cout << "Resident found:" << endl;
+            it->display();
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        cout << "Resident not found." << endl;
+    }
+
+    // Display unique occupations
+    cout << "\nUnique Occupations:" << endl;
+    for (auto it = occupations.begin(); it != occupations.end(); ++it) {
+        cout << *it << endl;
+    }
+
+    cout << "\nAll done!" << endl;
+}
